@@ -13,7 +13,7 @@
 ### The All-in-One Fashion App
 *Catalog your closet, find your look, build your outfit — with an AI stylist that actually knows your wardrobe.*
 
-[![React](https://img.shields.io/badge/React-Frontend-61DAFB?style=flat-square&logo=react&logoColor=white)](https://react.dev)
+[![Next.js](https://img.shields.io/badge/Next.js-Frontend-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org)
 [![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-ML_Service-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Database-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://mongodb.com)
@@ -48,7 +48,7 @@ Built as a Full Stack MERN + ML semester project.
 ## Tech Stack
 
 **Frontend**
-- React (Vite)
+- Next.js
 - Tailwind CSS
 - `@dnd-kit` / `react-dnd` for the outfit canvas
 
@@ -71,7 +71,7 @@ Built as a Full Stack MERN + ML semester project.
 ## Architecture
 
 ```
-React Client ──▶ Node/Express API ──▶ MongoDB
+Next.js Client ──▶ Node/Express API ──▶ MongoDB
                         │
                         ▼
               Python FastAPI (ML) ──▶ Qdrant (vectors)
@@ -88,7 +88,7 @@ Node handles auth, CRUD, and orchestration. Python handles all ML work (CLIP inf
 
 ```
 closetly/
-├── client/            # React frontend
+├── client/            # Next.js frontend
 ├── server/            # Node/Express API
 ├── ml-service/        # Python FastAPI ML microservice
 └── README.md
@@ -128,7 +128,7 @@ pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
 
-### 4. Frontend (React)
+### 4. Frontend (Next.js)
 ```bash
 cd client
 npm install

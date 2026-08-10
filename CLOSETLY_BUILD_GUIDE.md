@@ -25,7 +25,7 @@ Closetly solves four separate problems in one app:
 
 ```
 ┌─────────────────┐       ┌──────────────────┐       ┌─────────────────────┐
-│   React Client  │─────▶│  Node/Express API │─────▶│   MongoDB (Atlas)   │
+│  Node.js Client │─────▶│  Node/Express API │─────▶│   MongoDB (Atlas)   │
 │  (Tailwind, DnD)│◀─────│   (auth, CRUD)    │◀─────│  users/closets/etc. │
 └─────────────────┘       └──────────┬───────┘       └─────────────────────┘
                                      │
@@ -51,7 +51,7 @@ Closetly solves four separate problems in one app:
 
 ## 3. Tech Stack
 
-- **Frontend:** React (Vite), Tailwind CSS, `react-dnd` or `@dnd-kit` for the outfit canvas, Axios/React Query
+- **Frontend:** Next.js, Tailwind CSS
 - **Backend (core):** Node.js, Express, JWT auth, Mongoose
 - **ML microservice:** Python 3.11, FastAPI, `transformers`/`open_clip` for CLIP, `qdrant-client`
 - **Database:** MongoDB (users, closet items, outfits, chat history) + Qdrant (image/text embeddings)
@@ -118,7 +118,7 @@ Qdrant stores one collection for closet-item image embeddings (payload: `userId`
 ## 5. Build Order (suggested week-by-week)
 
 **Phase 1 — Foundation (Weeks 1–2)**
-- Set up MERN skeleton: Express API, MongoDB schemas, JWT auth, React app scaffold
+- Set up MERN skeleton: Express API, MongoDB schemas, JWT auth, Next.js app scaffold
 - Basic CRUD: register/login, add/view/delete closet items (no ML yet — just image upload + manual tags)
 - Get image upload → Cloudinary/S3 working end to end
 
@@ -197,7 +197,7 @@ python -m venv venv && source venv/bin/activate
 pip install fastapi uvicorn open_clip_torch qdrant-client python-multipart httpx beautifulsoup4 google-search-results
 uvicorn main:app --reload --port 8000
 
-# Frontend (React)
+# Frontend (Node.js)
 cd client
 npm install
 npm run dev
