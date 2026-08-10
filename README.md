@@ -1,6 +1,33 @@
-# Closetly
+<div align="center">
 
-**The All-in-One Fashion App**
+```
+ ██████╗██╗      ██████╗ ███████╗███████╗████████╗██╗  ██╗   ██╗
+██╔════╝██║     ██╔═══██╗██╔════╝██╔════╝╚══██╔══╝██║  ╚██╗ ██╔╝
+██║     ██║     ██║   ██║███████╗█████╗     ██║   ██║   ╚████╔╝ 
+██║     ██║     ██║   ██║╚════██║██╔══╝     ██║   ██║    ╚██╔╝  
+╚██████╗███████╗╚██████╔╝███████║███████╗   ██║   ███████╗██║   
+ ╚═════╝╚══════╝ ╚═════╝ ╚══════╝╚══════╝   ╚═╝   ╚══════╝╚═╝   
+```
+
+# Closetly
+### The All-in-One Fashion App
+*Catalog your closet, find your look, build your outfit — with an AI stylist that actually knows your wardrobe.*
+
+[![React](https://img.shields.io/badge/React-Frontend-61DAFB?style=flat-square&logo=react&logoColor=white)](https://react.dev)
+[![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-ML_Service-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Database-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://mongodb.com)
+[![Qdrant](https://img.shields.io/badge/Qdrant-VectorDB-DC244C?style=flat-square)](https://qdrant.tech)
+[![CLIP](https://img.shields.io/badge/CLIP-Embeddings-412991?style=flat-square&logo=openai&logoColor=white)](https://openai.com/research/clip)
+[![Tailwind](https://img.shields.io/badge/Tailwind-Styling-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+
+</div>
+
+---
+
+
+
+## Overview
 
 Closetly is a unified fashion platform that lets you catalog your closet, find matching pieces from reference images, shop for items you don't own, build and visualize outfits, and chat with an AI fashion agent grounded in your actual wardrobe.
 
