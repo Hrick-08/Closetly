@@ -24,22 +24,22 @@ Closetly solves four separate problems in one app:
 ## 2. Architecture
 
 ```
-┌─────────────────┐      ┌──────────────────┐      ┌─────────────────────┐
-│   React Client   │─────▶│  Node/Express API │─────▶│   MongoDB (Atlas)    │
-│  (Tailwind, DnD)  │◀─────│   (auth, CRUD)     │◀─────│  users/closets/etc.  │
-└─────────────────┘      └──────────┬────────┘      └─────────────────────┘
+┌─────────────────┐       ┌──────────────────┐       ┌─────────────────────┐
+│   React Client  │─────▶│  Node/Express API │─────▶│   MongoDB (Atlas)   │
+│  (Tailwind, DnD)│◀─────│   (auth, CRUD)    │◀─────│  users/closets/etc. │
+└─────────────────┘       └──────────┬───────┘       └─────────────────────┘
                                      │
                                      │ internal calls
                                      ▼
-                          ┌──────────────────────┐      ┌────────────────┐
-                          │  Python FastAPI (ML)  │─────▶│  Qdrant (vector) │
-                          │  CLIP, RAG, scoring    │◀─────│   embeddings     │
-                          └──────────┬────────────┘      └────────────────┘
+                          ┌──────────────────────┐       ┌────────────────┐
+                          │  Python FastAPI (ML) │─────▶│  Qdrant (vector)│
+                          │  CLIP, RAG, scoring  │◀─────│   embeddings    │
+                          └──────────┬───────────┘       └────────────────┘
                                      │
                                      ▼
                           ┌──────────────────────┐
-                          │   LLM API (OpenAI/     │
-                          │   Gemini/OpenClaw)     │
+                          │   LLM API (OpenAI/   │
+                          │   Gemini/OpenClaw)   │
                           └──────────────────────┘
 ```
 

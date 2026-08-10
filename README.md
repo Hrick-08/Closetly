@@ -1,36 +1,180 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Closetly
+
+**The All-in-One Fashion App**
+
+Closetly is a unified fashion platform that lets you catalog your closet, find matching pieces from reference images, shop for items you don't own, build and visualize outfits, and chat with an AI fashion agent grounded in your actual wardrobe.
+
+Built as a Full Stack MERN + ML semester project.
+
+---
+
+## Features
+
+- **Closet Cataloging** — Upload photos of your clothes; items are automatically tagged (category, color, pattern) using CLIP-based classification.
+- **Visual Search** — Upload a reference/inspo image and find matching pieces already in your closet, powered by CLIP embeddings and vector similarity search.
+- **Shop the Look** — For pieces you don't own, find buyable matches online from the same reference image, re-ranked by visual similarity.
+- **Outfit Builder & Visualizer** — Drag-and-drop canvas to compose outfits from your closet, scored for compatibility.
+- **RAG Fashion Agent** — Chat with an AI stylist that knows your closet, saved outfits, and general fashion knowledge.
+
+---
+
+## Tech Stack
+
+**Frontend**
+- React (Vite)
+- Tailwind CSS
+- `@dnd-kit` / `react-dnd` for the outfit canvas
+
+**Backend**
+- Node.js + Express (auth, CRUD, orchestration)
+- Python + FastAPI (ML microservice: embeddings, search, scoring, RAG)
+
+**Database & Storage**
+- MongoDB (users, closet items, outfits, chat history)
+- Qdrant (vector embeddings)
+- Cloudinary / AWS S3 (image storage)
+
+**ML / AI**
+- CLIP (OpenCLIP) for image embeddings and zero-shot tagging
+- SerpAPI for shop-the-look product search
+- RAG pipeline + LLM API for the fashion chat agent
+
+---
+
+## Architecture
+
+```
+React Client ──▶ Node/Express API ──▶ MongoDB
+                        │
+                        ▼
+              Python FastAPI (ML) ──▶ Qdrant (vectors)
+                        │
+                        ▼
+                  LLM API (RAG agent)
+```
+
+Node handles auth, CRUD, and orchestration. Python handles all ML work (CLIP inference, vector search, product matching, RAG) and is called internally by the Node API.
+
+---
+
+## Project Structure
+
+```
+closetly/
+├── client/            # React frontend
+├── server/            # Node/Express API
+├── ml-service/        # Python FastAPI ML microservice
+└── README.md
+```
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 18+
+- Python 3.11+
+- MongoDB instance (local or Atlas)
+- Qdrant instance (local or cloud)
+- SerpAPI key
+- LLM API key (OpenAI/Gemini/etc.)
 
+### 1. Clone the repo
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/<your-org>/closetly.git
+cd closetly
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Backend (Node)
+```bash
+cd server
+npm install
+cp .env.example .env   # fill in required values
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. ML Service (Python)
+```bash
+cd ml-service
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. Frontend (React)
+```bash
+cd client
+npm install
+npm run dev
+```
 
-## Learn More
+### Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+Each service needs its own `.env`. Key variables for `server/.env`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+MONGO_URI=
+JWT_SECRET=
+CLOUDINARY_URL=
+ML_SERVICE_URL=http://localhost:8000
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Key variables for `ml-service/.env`:
 
-## Deploy on Vercel
+```
+QDRANT_URL=
+LLM_API_KEY=
+SERPAPI_KEY=
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## API Overview
+
+**Node/Express**
+| Method | Route | Description |
+|---|---|---|
+| POST | `/api/auth/register` | Create account |
+| POST | `/api/auth/login` | Log in |
+| GET | `/api/closet` | List closet items |
+| POST | `/api/closet` | Upload + auto-tag a closet item |
+| DELETE | `/api/closet/:id` | Remove a closet item |
+| POST | `/api/search/reference` | Visual search against closet |
+| POST | `/api/shop/lookup` | Shop-the-look search |
+| POST | `/api/outfits` | Save an outfit |
+| GET | `/api/outfits` | List saved outfits |
+| POST | `/api/chat` | Message the RAG fashion agent |
+
+**Python/FastAPI**
+| Method | Route | Description |
+|---|---|---|
+| POST | `/embed` | Generate CLIP embedding + suggested tags |
+| POST | `/search` | Visual similarity search over closet |
+| POST | `/shop-lookup` | Product search from a reference image |
+| POST | `/score` | Outfit compatibility score |
+| POST | `/rag` | RAG-based fashion advice |
+
+---
+
+## Roadmap
+
+- [ ] Closet upload + auto-tagging
+- [ ] Visual search from reference images
+- [ ] Shop-the-look web search
+- [ ] Outfit builder + compatibility scoring
+- [ ] RAG fashion agent
+- [ ] Virtual try-on (stretch goal)
+- [ ] Weather-aware outfit suggestions (stretch goal)
+- [ ] Social features — share outfits, follow closets (stretch goal)
+
+---
+
+## Contributors
+
+- Group G-10 — [Chitkara University]
+
+---
+
+## License
+
+This project is for academic purposes as part of a Full Stack MERN + ML semester course.
