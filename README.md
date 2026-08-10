@@ -194,14 +194,3 @@ SERPAPI_KEY=
 - [ ] Weather-aware outfit suggestions (stretch goal)
 - [ ] Social features — share outfits, follow closets (stretch goal)
 
----
-
-## Contributors
-
-- Group G-10 — [Chitkara University]
-
----
-
-## License
-
-This project is for academic purposes as part of a Full Stack MERN + ML semester course.
