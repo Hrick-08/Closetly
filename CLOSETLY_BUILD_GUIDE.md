@@ -13,10 +13,11 @@ Closetly solves four separate problems in one app:
 |---|---|---|
 | Closet Upload & Cataloging | Upload clothing photos → auto-tagged (category, color, pattern) | CLIP zero-shot classification |
 | Visual Search from Reference | Upload an inspo pic → find matching pieces in your closet | CLIP embeddings + vector similarity |
+| Shop-the-Look (Web Search) | For pieces you don't own, find buyable matches online from the same reference pic | Web scraping/search API + CLIP re-ranking |
 | Outfit Builder & Visualizer | Drag-and-drop canvas to compose outfits, scored for compatibility | Embedding-based compatibility scoring |
 | RAG Fashion Agent | Chat with an AI stylist grounded in your actual closet | RAG pipeline + LLM |
 
-**MVP scope for the semester:** all four features above, flat-lay style visualization (no virtual try-on). Virtual try-on (warping clothes onto a body photo) is a stretch goal only — don't let it block the MVP.
+**MVP scope for the semester:** all five features above, flat-lay style visualization (no virtual try-on). Virtual try-on (warping clothes onto a body photo) is a stretch goal only — don't let it block the MVP.
 
 ---
 
@@ -42,7 +43,9 @@ Closetly solves four separate problems in one app:
                           └──────────────────────┘
 ```
 
-**Why this split:** Node/Express handles auth, CRUD, and orchestration — things it's fast and simple for. Python/FastAPI is a separate microservice purely for ML work (CLIP inference, RAG retrieval, scoring), since that's where the ML libraries actually live. Node calls the Python service over internal HTTP. This polyglot setup is also a good interview talking point.
+**Why this split:** Node/Express handles auth, CRUD, and orchestration — things it's fast and simple for. Python/FastAPI is a separate microservice purely for ML work (CLIP inference, RAG retrieval, scoring, product search), since that's where the ML libraries actually live. Node calls the Python service over internal HTTP. This polyglot setup is also a good interview talking point.
+
+**Shop-the-look flow specifically:** when a reference image doesn't fully match anything in the user's closet, the Python service queries a product search API (SerpAPI's Google Shopping/Google Lens endpoints work well — you've already used SerpAPI in FashionFind) for visually similar buyable items, scrapes/parses product-level pages for price and a direct link, then re-ranks results by CLIP similarity to the reference image before returning them. This reuses the exact `inurl:` filtering approach from FashionFind to make sure links land on actual product pages instead of category/listing pages.
 
 ---
 
@@ -95,6 +98,17 @@ Closetly solves four separate problems in one app:
   messages: [{ role, content, createdAt }],
   createdAt
 }
+
+// shopResults (cached web-scraped matches for a reference image, avoids re-scraping)
+{
+  _id, userId,
+  referenceImageUrl,
+  results: [{
+    productUrl, imageUrl, title, price, source, // e.g. "Myntra", "Nykaa"
+    similarityScore
+  }],
+  createdAt   // used for cache expiry, e.g. re-scrape after 7 days
+}
 ```
 
 Qdrant stores one collection for closet-item image embeddings (payload: `userId`, `closetItemId`) and optionally a second collection for the RAG knowledge base (style guides, color theory articles).
@@ -115,19 +129,25 @@ Qdrant stores one collection for closet-item image embeddings (payload: `userId`
 - Set up Qdrant, store embeddings on upload
 - Endpoint: `POST /search` — takes a reference image, returns top-k similar closet items for that user
 
-**Phase 3 — Outfit Builder (Weeks 6–8)**
+**Phase 3 — Shop-the-Look / Web Search (Weeks 6–7)**
+- Integrate a product search API (SerpAPI Google Lens/Shopping, or scrape target sites directly with `httpx` + BeautifulSoup)
+- Endpoint: `POST /shop-lookup` — takes a reference image, queries the search API, filters results to actual product-page URLs (not category pages), re-ranks by CLIP similarity to the reference image
+- Cache results in `shopResults` so repeated searches on the same reference image don't re-scrape
+- Note: this only runs when visual search against the user's own closet doesn't find a strong enough match — closet search should always be tried first since it's faster and free
+
+**Phase 4 — Outfit Builder (Weeks 8–9)**
 - React drag-and-drop canvas: pick items from closet, arrange into an outfit
 - Save outfit to MongoDB
 - Compatibility scoring: start simple (average pairwise cosine similarity of item embeddings, or a small rule-based color/category compatibility heuristic) before attempting anything GNN-based
 - Stretch: train a small GNN on a dataset like Polyvore if time allows, otherwise the heuristic scorer is a perfectly legitimate MVP
 
-**Phase 4 — RAG Fashion Agent (Weeks 9–11)**
+**Phase 5 — RAG Fashion Agent (Weeks 10–11)**
 - Build a small knowledge base (style/color-theory articles, scraped or written) and embed it into Qdrant
 - RAG endpoint: retrieve relevant knowledge chunks + user's closet/outfit context → pass to LLM → return styling advice
 - Chat UI in React, persist history in MongoDB
 - Tool-calling pattern (reusable from R.I.S.H.I.): agent can call `get_closet_items`, `get_saved_outfits`, optionally `get_weather` for occasion-based advice
 
-**Phase 5 — Polish (Weeks 12–13)**
+**Phase 6 — Polish (Weeks 12–13)**
 - Error handling, loading states, empty states
 - Deploy all three services (frontend, Node API, Python ML service)
 - Write project report / demo video
@@ -147,6 +167,7 @@ DELETE /api/closet/:id
 POST   /api/outfits
 GET    /api/outfits
 POST   /api/search/reference   (proxies to Python /search)
+POST   /api/shop/lookup         (proxies to Python /shop-lookup)
 POST   /api/chat                (proxies to Python /rag)
 ```
 
@@ -154,6 +175,7 @@ POST   /api/chat                (proxies to Python /rag)
 ```
 POST /embed          -> { embedding, suggestedTags }
 POST /search          -> { matches: [closetItemId, score] }
+POST /shop-lookup     -> { results: [{ productUrl, imageUrl, title, price, source, similarityScore }] }
 POST /score            -> { compatibilityScore }
 POST /rag               -> { reply, sourcesUsed }
 ```
@@ -172,7 +194,7 @@ npm run dev
 # ML service (Python)
 cd ml-service
 python -m venv venv && source venv/bin/activate
-pip install fastapi uvicorn open_clip_torch qdrant-client python-multipart
+pip install fastapi uvicorn open_clip_torch qdrant-client python-multipart httpx beautifulsoup4 google-search-results
 uvicorn main:app --reload --port 8000
 
 # Frontend (React)
@@ -189,6 +211,7 @@ CLOUDINARY_URL= (or AWS_S3_*)
 ML_SERVICE_URL=http://localhost:8000
 QDRANT_URL=
 LLM_API_KEY=
+SERPAPI_KEY=
 ```
 
 ---
@@ -200,6 +223,7 @@ The single biggest risk to a project like this is scope creep — it's genuinely
 - Use a heuristic/embedding-based compatibility scorer before attempting a custom GNN
 - Get one CLIP-based feature (auto-tagging) rock solid before adding the second (visual search) — they share the same embedding pipeline, so this is less work than it sounds
 - The RAG agent can start with just the LLM + closet context (no external knowledge base) and add the knowledge-base retrieval later — a working simple agent beats a broken sophisticated one
+- Prefer a search API (SerpAPI) over raw scraping where possible — it's faster to build, avoids getting IP-blocked by retailers, and sidesteps ToS gray areas; only fall back to direct scraping for a specific site if the API doesn't cover it
 
 ---
 
